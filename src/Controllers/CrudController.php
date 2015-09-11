@@ -28,6 +28,22 @@ abstract class CrudController extends RootController
 		return Response::json($entity);
 	}
 
+	public function destroy($id)
+	{
+		$entity = $this->model->find($id);
+		if (! $entity) {
+			return Response::json(['error' => 'not_found'], 404);
+		}
+
+		try {
+			$entity->delete();
+		} catch (\Exception $e) {
+			return Response::json(['error' => 'internal_error'], 500);
+		}
+
+		return Response::make(null, 204);
+	}
+
 	/**
 	 * Returns an instance of the model
 	 * related to this controller.
