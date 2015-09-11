@@ -2,6 +2,7 @@
 namespace Afonso\LvCrud\Controllers;
 
 use Evalua\Toolbox\Constants\HttpStatusCodes;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Pluralizer;
 
@@ -27,6 +28,23 @@ abstract class CrudController extends RootController
 		}
 
 		return Response::json($entity);
+	}
+
+	public function store(Request $request)
+	{
+		if ($this->model->isReadOnly()) {
+			return Response::json(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+		}
+
+		$data = $request->all();
+
+		try {
+			$entity = $this->model->create($data);
+		} catch (\Exception $e) {
+			return Response::json(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
+		}
+
+		return Response::json($entity, HttpStatusCodes::CREATED);
 	}
 
 	public function destroy($id)
