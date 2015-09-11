@@ -30,6 +30,10 @@ abstract class CrudController extends RootController
 
 	public function destroy($id)
 	{
+		if ($this->model->isReadOnly()) {
+			return Response::json(['error' => 'method_not_allowed'], 405);
+		}
+
 		$entity = $this->model->find($id);
 		if (! $entity) {
 			return Response::json(['error' => 'not_found'], 404);
