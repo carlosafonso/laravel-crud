@@ -1,6 +1,7 @@
 <?php
 namespace Afonso\LvCrud\Controllers;
 
+use Evalua\Toolbox\Constants\HttpStatusCodes;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Pluralizer;
 
@@ -22,7 +23,7 @@ abstract class CrudController extends RootController
 	{
 		$entity = $this->model->find($id);
 		if (! $entity) {
-			return Response::json(['error' => 'not_found'], 404);
+			return Response::json(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
 		}
 
 		return Response::json($entity);
@@ -31,21 +32,21 @@ abstract class CrudController extends RootController
 	public function destroy($id)
 	{
 		if ($this->model->isReadOnly()) {
-			return Response::json(['error' => 'method_not_allowed'], 405);
+			return Response::json(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
 		}
 
 		$entity = $this->model->find($id);
 		if (! $entity) {
-			return Response::json(['error' => 'not_found'], 404);
+			return Response::json(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
 		}
 
 		try {
 			$entity->delete();
 		} catch (\Exception $e) {
-			return Response::json(['error' => 'internal_error'], 500);
+			return Response::json(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
 		}
 
-		return Response::make(null, 204);
+		return Response::make(null, HttpStatusCodes::NO_CONTENT);
 	}
 
 	/**

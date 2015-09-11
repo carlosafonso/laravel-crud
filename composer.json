@@ -9,6 +9,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "evalua/php-toolbox": "dev-master",
         "laravel/framework": "^5.1"
     },
     "require-dev": {
