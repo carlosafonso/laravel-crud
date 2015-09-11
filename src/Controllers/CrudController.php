@@ -47,6 +47,29 @@ abstract class CrudController extends RootController
 		return Response::json($entity, HttpStatusCodes::CREATED);
 	}
 
+	public function update(Request $request, $id)
+	{
+		if ($this->model->isReadOnly()) {
+			return Response::json(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+		}
+
+		$entity = $this->model->find($id);
+		if (! $entity) {
+			return Response::json(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+		}
+
+		$data = $request->all();
+
+		try {
+			$entity->fill($data);
+			$entity->save();
+		} catch (\Exception $e) {
+			return Response::json(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
+		}
+
+		return Response::json($entity, HttpStatusCodes::OK);
+	}
+
 	public function destroy($id)
 	{
 		if ($this->model->isReadOnly()) {
