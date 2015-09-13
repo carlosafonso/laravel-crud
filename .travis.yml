@@ -10,3 +10,10 @@ before_script:
  - travis_retry composer install --prefer-source --no-interaction --dev
 
 script: vendor/bin/phpunit --verbose --coverage-clover=build/logs/clover.xml tests/
+
+addons:
+  code_climate:
+    repo_token: b112298b816e12f0317a3f2d15766a2b1e2c40398645879495518fa42221597b
+
+after_script:
+ - vendor/bin/test-reporter

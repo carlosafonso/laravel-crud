@@ -1,5 +1,6 @@
 # laravel-crud
 [![Build Status](https://travis-ci.org/carlosafonso/laravel-crud.svg?branch=master)](https://travis-ci.org/carlosafonso/laravel-crud)
+[![Code Climate](https://codeclimate.com/github/carlosafonso/laravel-crud/badges/gpa.svg)](https://codeclimate.com/github/carlosafonso/laravel-crud)
 
 Convenience layer on top of the Laravel framework for developing CRUD applications
 
