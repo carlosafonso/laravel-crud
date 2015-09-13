@@ -10,24 +10,29 @@ class ContextTest extends BaseTestCase
 {
 	public function testContextWith()
 	{
-		$req = Request::create('foo', 'GET', ['with' => 'foo']);
+		$req = $this->getRequest(['with' => 'foo']);
 		$ctx = new Context($req);
 
 		$this->assertEquals(['foo'], $ctx->with());
 
-		$req = Request::create('foo', 'GET', ['with' => 'foo,bar']);
+		$req = $this->getRequest(['with' => 'foo,bar']);
 		$ctx = new Context($req);
 
 		$this->assertEquals(['foo', 'bar'], $ctx->with());
 
-		$req = Request::create('foo', 'GET', ['with' => '  foo , bar']);
+		$req = $this->getRequest(['with' => '  foo , bar']);
 		$ctx = new Context($req);
 
 		$this->assertEquals(['foo', 'bar'], $ctx->with());
 
-		$req = Request::create('foo', 'GET', []);
+		$req = $this->getRequest([]);
 		$ctx = new Context($req);
 
 		$this->assertEquals([], $ctx->with());
+	}
+
+	private function getRequest($params)
+	{
+		return Request::create('foo', 'GET', $params);
 	}
 }
