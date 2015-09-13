@@ -3,26 +3,42 @@ namespace Afonso\LvCrud\Controllers;
 
 use Evalua\Toolbox\Constants\HttpStatusCodes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request as RequestFacade;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Pluralizer;
 
+use Afonso\LvCrud\Context;
+
 abstract class CrudController extends RootController
 {
-	private $model;
+	protected $model;
+
+	/**
+	 * The context of the current request.
+	 *
+	 * @var	Afonso\LvCrud\Context
+	 */
+	protected $ctx;
 
 	public function __construct()
 	{
 		$this->model = $this->getRelatedModel();
+
+		$this->ctx = new Context(RequestFacade::instance());
 	}
+
+	/*
+	 * CRUD methods
+	 */
 
 	public function index()
 	{
-		return Response::json($this->model->all());
+		return Response::json($this->model->with($this->ctx->with())->get());
 	}
 
 	public function show($id)
 	{
-		$entity = $this->model->find($id);
+		$entity = $this->model->with($this->ctx->with())->find($id);
 		if (! $entity) {
 			return Response::json(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
 		}
@@ -39,7 +55,8 @@ abstract class CrudController extends RootController
 		$data = $request->all();
 
 		try {
-			$entity = $this->model->create($data);
+			$inserted = $this->model->create($data);
+			$entity = $this->model->with($this->ctx->with())->find($inserted->id);
 		} catch (\Exception $e) {
 			return Response::json(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
 		}
@@ -61,8 +78,8 @@ abstract class CrudController extends RootController
 		$data = $request->all();
 
 		try {
-			$entity->fill($data);
-			$entity->save();
+			$entity->fill($data)->save();
+			$entity = $this->model->with($this->ctx->with())->find($id);
 		} catch (\Exception $e) {
 			return Response::json(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
 		}
@@ -89,6 +106,10 @@ abstract class CrudController extends RootController
 
 		return Response::make(null, HttpStatusCodes::NO_CONTENT);
 	}
+
+	/*
+	 * End of CRUD methods
+	 */
 
 	/**
 	 * Returns an instance of the model
