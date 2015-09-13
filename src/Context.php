@@ -19,6 +19,10 @@ class Context
 
 	protected function setWith($with)
 	{
-		$this->with = $with ? explode(',', $with) : [];
+		if ($with) {
+			$this->with = array_map('trim', explode(',', $with));
+		} else {
+			$this->with = [];
+		}
 	}
 }
