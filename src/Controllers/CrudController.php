@@ -9,9 +9,16 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Pluralizer;
 
 use Afonso\LvCrud\Context;
+use Afonso\LvCrud\Responses\ResponseBuilderFactory;
 
 abstract class CrudController extends RootController
 {
+	/**
+	 * The model instance related to
+	 * this controller.
+	 *
+	 * @var	Afonso\LvCrud\BaseModel
+	 */
 	protected $model;
 
 	/**
@@ -21,104 +28,111 @@ abstract class CrudController extends RootController
 	 */
 	protected $ctx;
 
+	/**
+	 * The response builder used to generate
+	 * content-type agnostic responses.
+	 *
+	 * @var	Afonso\LvCrud\ResponseBuilderInterface
+	 */
+	protected $response;
+
 	public function __construct()
 	{
 		$this->model = $this->getRelatedModel();
 
 		$this->ctx = new Context(RequestFacade::instance());
+
+		$this->response = ResponseBuilderFactory::forRequest(RequestFacade::instance());
 	}
 
 	/*
 	 * CRUD methods
 	 */
-
 	public function index()
 	{
-		return Response::json($this->model->with($this->ctx->with())->get());
+		return $this->response->build($this->model->with($this->ctx->with())->get());
 	}
 
 	public function show($id)
 	{
 		$entity = $this->model->with($this->ctx->with())->find($id);
 		if (! $entity) {
-			return Response::json(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
 		}
 
-		return Response::json($entity);
+		return $this->response->build($entity);
 	}
 
 	public function store(Request $request)
 	{
 		if ($this->model->isReadOnly()) {
-			return Response::json(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+			return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
 		}
-
 
 		$data = $request->all();
 		$validator = Validator::make($data, $this->model->getValidationRules());
 
 		if ($validator->fails()) {
-			return Response::json(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
+			return $this->response->build(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
 		}
 
 		try {
 			$inserted = $this->model->create($data);
 			$entity = $this->model->with($this->ctx->with())->find($inserted->id);
 		} catch (\Exception $e) {
-			return Response::json(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
+			return $this->response->build(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
 		}
 
-		return Response::json($entity, HttpStatusCodes::CREATED);
+		return $this->respone->build($entity, HttpStatusCodes::CREATED);
 	}
 
 	public function update(Request $request, $id)
 	{
 		if ($this->model->isReadOnly()) {
-			return Response::json(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+			return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
 		}
 
 		$entity = $this->model->find($id);
 		if (! $entity) {
-			return Response::json(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
 		}
 
 		$data = $request->all();
 		$validator = Validator::make($data, $this->model->getValidationRules());
 
 		if ($validator->fails()) {
-			return Response::json(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
+			return $this->response->build(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
 		}
 
 		try {
 			$entity->fill($data)->save();
 			$entity = $this->model->with($this->ctx->with())->find($id);
 		} catch (\Exception $e) {
-			return Response::json(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
+			return $this->response->build(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
 		}
 
-		return Response::json($entity, HttpStatusCodes::OK);
+		return $this->response->build($entity, HttpStatusCodes::OK);
 	}
 
 	public function destroy($id)
 	{
 		if ($this->model->isReadOnly()) {
-			return Response::json(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+			return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
 		}
 
 		$entity = $this->model->find($id);
 		if (! $entity) {
-			return Response::json(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
 		}
 
 		try {
 			$entity->delete();
 		} catch (\Exception $e) {
-			return Response::json(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
+			return $this->response->build(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
 		}
 
-		return Response::make(null, HttpStatusCodes::NO_CONTENT);
+		return $this->response->build(null, HttpStatusCodes::NO_CONTENT);
 	}
-
 	/*
 	 * End of CRUD methods
 	 */
