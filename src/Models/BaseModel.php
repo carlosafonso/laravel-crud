@@ -18,4 +18,12 @@ abstract class BaseModel extends EloquentModel
 	{
 		return false;
 	}
+
+	/**
+	 * Returns the validation rules which
+	 * apply to this model.
+	 *
+	 * @return	array
+	 */
+	abstract public function getValidationRules();
 }

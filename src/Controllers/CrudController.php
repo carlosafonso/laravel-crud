@@ -5,6 +5,7 @@ use Evalua\Toolbox\Constants\HttpStatusCodes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as RequestFacade;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Pluralizer;
 
 use Afonso\LvCrud\Context;
@@ -52,7 +53,13 @@ abstract class CrudController extends RootController
 			return Response::json(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
 		}
 
+
 		$data = $request->all();
+		$validator = Validator::make($data, $this->model->getValidationRules());
+
+		if ($validator->fails()) {
+			return Response::json(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
+		}
 
 		try {
 			$inserted = $this->model->create($data);
@@ -76,6 +83,11 @@ abstract class CrudController extends RootController
 		}
 
 		$data = $request->all();
+		$validator = Validator::make($data, $this->model->getValidationRules());
+
+		if ($validator->fails()) {
+			return Response::json(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
+		}
 
 		try {
 			$entity->fill($data)->save();
