@@ -23,6 +23,9 @@ class HtmlResponseBuilder extends ResponseBuilder /* implements ResponseBuilderI
 			return "{$view}.index";
 		} elseif (count($segments) === 2) {
 			if ($method === 'GET') {
+				if ($segments[1] === 'create') {
+					return "{$view}.create";
+				}
 				return "{$view}.show";
 			}
 			if ($method === 'DELETE') {
@@ -30,9 +33,6 @@ class HtmlResponseBuilder extends ResponseBuilder /* implements ResponseBuilderI
 			}
 			if ($method === 'PUT') {
 				return "{$view}.update";
-			}
-			if ($segments[1] === 'create') {
-				return "{$view}.create";
 			}
 		} elseif (count($segments) === 3) {
 			if ($segments[2] === 'edit') {

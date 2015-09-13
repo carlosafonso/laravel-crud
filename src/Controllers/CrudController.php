@@ -53,6 +53,11 @@ abstract class CrudController extends RootController
 		return $this->response->build($this->model->with($this->ctx->with())->get());
 	}
 
+	public function create()
+	{
+		return $this->response->build(null);
+	}
+
 	public function show($id)
 	{
 		$entity = $this->model->with($this->ctx->with())->find($id);
@@ -84,6 +89,16 @@ abstract class CrudController extends RootController
 		}
 
 		return $this->respone->build($entity, HttpStatusCodes::CREATED);
+	}
+
+	public function edit($id)
+	{
+		$entity = $this->model->with($this->ctx->with())->find($id);
+		if (! $entity) {
+			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+		}
+
+		return $this->response->build($entity);
 	}
 
 	public function update(Request $request, $id)
