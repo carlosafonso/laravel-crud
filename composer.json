@@ -1,10 +1,10 @@
 {
     "name": "carlosafonso/laravel-crud",
-    "description": "Simplified CRUD apps in Laravel",
+    "description": "Convenience layer on top of the Laravel framework for developing CRUD applications",
     "authors": [
         {
             "name": "Carlos Afonso Pérez",
-            "email": "carlos.afonso.perez@e-valua.es"
+            "email": "carlos.afonso.perez@gmail.com"
         }
     ],
     "require": {
