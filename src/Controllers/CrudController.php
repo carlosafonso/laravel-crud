@@ -42,7 +42,7 @@ abstract class CrudController extends RootController
 
 		$this->ctx = new Context(RequestFacade::instance());
 
-		$this->response = ResponseBuilderFactory::forRequest(RequestFacade::instance());
+		$this->response = ResponseBuilderFactory::forRequest(RequestFacade::instance(), $this);
 	}
 
 	/*
@@ -215,5 +215,27 @@ abstract class CrudController extends RootController
 	protected function getModelNamespace()
 	{
 		return null;
+	}
+
+	/**
+	 * Returns whether this controller instance
+	 * supports JSON responses.
+	 *
+	 * @return	boolean
+	 */
+	public function supportsJson()
+	{
+		return true;
+	}
+
+	/**
+	 * Returns whether this controller instance
+	 * supports HTML responses.
+	 *
+	 * @return	boolean
+	 */
+	public function supportsHtml()
+	{
+		return true;
 	}
 }
