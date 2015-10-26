@@ -25,5 +25,8 @@ abstract class BaseModel extends EloquentModel
 	 *
 	 * @return	array
 	 */
-	abstract public function getValidationRules();
+	public function getValidationRules()
+	{
+		return [];
+	}
 }
