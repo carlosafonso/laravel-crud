@@ -88,7 +88,7 @@ abstract class CrudController extends RootController
 			return $this->response->build(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
 		}
 
-		return $this->respone->build($entity, HttpStatusCodes::CREATED);
+		return $this->response->build($entity, HttpStatusCodes::CREATED);
 	}
 
 	public function edit($id)
