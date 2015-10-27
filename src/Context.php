@@ -20,7 +20,9 @@ class Context
 	protected function setWith($with)
 	{
 		if ($with) {
-			$this->with = array_map('trim', explode(',', $with));
+			$this->with = array_map(function($v) {
+				return trim(camel_case($v));
+			}, explode(',', $with));
 		} else {
 			$this->with = [];
 		}
