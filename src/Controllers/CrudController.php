@@ -77,14 +77,35 @@ abstract class CrudController extends RootController
 		}
 
 		$data = $request->all();
+
+		// hook: beforeValidate()
+		if ($hookResult = $this->beforeValidate($request, $data)) {
+			return $hookResult;
+		}
+
+		// hook: beforeStoreValidate()
+		if ($hookResult = $this->beforeStoreValidate($request, $data)) {
+			return $hookResult;
+		}
+
 		$validator = Validator::make($data, $this->model->getValidationRules());
 
 		if ($validator->fails()) {
 			return $this->response->build(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
 		}
 
+		// hook: beforeInsert()
+		if ($hookResult = $this->beforeInsert($request, $data)) {
+			return $hookResult;
+		}
+
 		$inserted = $this->model->create($data);
 		$entity = $this->model->with($this->ctx->with())->find($inserted->id);
+
+		// hook: afterInsert()
+		if ($hookResult = $this->afterInsert($request, $entity)) {
+			return $hookResult;
+		}
 
 		return $this->response->build($entity, HttpStatusCodes::CREATED);
 	}
@@ -111,14 +132,35 @@ abstract class CrudController extends RootController
 		}
 
 		$data = $request->all();
+
+		// hook: beforeValidate()
+		if ($hookResult = $this->beforeValidate($request, $data)) {
+			return $hookResult;
+		}
+
+		// hook: beforeUpdateValidate()
+		if ($hookResult = $this->beforeUpdateValidate($request, $id, $data)) {
+			return $hookResult;
+		}
+
 		$validator = Validator::make($data, $this->model->getValidationRules());
 
 		if ($validator->fails()) {
 			return $this->response->build(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
 		}
 
+		// hook: beforeUpdate()
+		if ($hookResult = $this->beforeUpdate($request, $data, $id)) {
+			return $hookResult;
+		}
+
 		$entity->fill($data)->save();
 		$entity = $this->model->with($this->ctx->with())->find($id);
+
+		// hook: afterUpdate()
+		if ($hookResult = $this->afterUpdate($request, $entity)) {
+			return $hookResult;
+		}
 
 		return $this->response->build($entity, HttpStatusCodes::OK);
 	}
@@ -140,6 +182,99 @@ abstract class CrudController extends RootController
 	}
 	/*
 	 * End of CRUD methods
+	 */
+
+	/*
+	 * Hooks
+	 */
+
+	/**
+	 * This hook runs before validation occurs
+	 * both on insertions an updates.
+	 *
+	 * Returning a non-null value will cause the
+	 * controller method to automatically return
+	 * with that value.
+	 */
+	public function beforeValidate(Request $request, &$data)
+	{
+		//
+	}
+
+	/**
+	 * This hook runs before validation occurs
+	 * on insertions, but after the beforeValidate()
+	 * hook has run.
+	 *
+	 * Returning a non-null value will cause the
+	 * controller method to automatically return
+	 * with that value.
+	 */
+	public function beforeStoreValidate(Request $request, &$data)
+	{
+		//
+	}
+
+	/**
+	 * This hook runs before validation occurs
+	 * on updates, but after the beforeValidate()
+	 * hook has run.
+	 *
+	 * Returning a non-null value will cause the
+	 * controller method to automatically return
+	 * with that value.
+	 */
+	public function beforeUpdateValidate(Request $request, $id, &$data)
+	{
+		//
+	}
+
+	/**
+	 * This hook runs before insertion occurs, but
+	 * after validation has passed.
+	 *
+	 * Returning a non-null value will cause the
+	 * controller method to automatically return
+	 * with that value.
+	 */
+	public function beforeInsert(Request $request, &$data)
+	{
+		//
+	}
+
+	/**
+	 * This hook runs after insertion occurs, as long
+	 * as it succeeds.
+	 */
+	public function afterInsert(Request $request, $entity)
+	{
+		//
+	}
+
+	/**
+	 * This hook runs before updating occurs, but
+	 * after validation has passed.
+	 *
+	 * Returning a non-null value will cause the
+	 * controller method to automatically return
+	 * with that value.
+	 */
+	public function beforeUpdate(Request $request, &$data, $id)
+	{
+		//
+	}
+
+	/**
+	 * This hook runs after updating occurs, as long
+	 * as it succeeds.
+	 */
+	public function afterUpdate(Request $request, $entity)
+	{
+		//
+	}
+
+	/*
+	 * End of hooks
 	 */
 
 	/**
