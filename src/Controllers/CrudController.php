@@ -50,7 +50,8 @@ abstract class CrudController extends RootController
 	 */
 	public function index()
 	{
-		$entities = $this->model->with($this->ctx->with())
+		$entities = $this->modifyIndexQuery($this->model->newQuery())
+			->with($this->ctx->with())
 			->paginate($this->ctx->pageSize());
 		return $this->response->build($entities);
 	}
@@ -62,7 +63,10 @@ abstract class CrudController extends RootController
 
 	public function show($id)
 	{
-		$entity = $this->model->with($this->ctx->with())->find($id);
+		$entity = $this->modifyShowQuery($this->model->newQuery())
+			->with($this->ctx->with())
+			->find($id);
+
 		if (! $entity) {
 			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
 		}
@@ -271,6 +275,28 @@ abstract class CrudController extends RootController
 	public function afterUpdate(Request $request, $entity)
 	{
 		//
+	}
+
+	/**
+	 * Returns a new query builder instance,
+	 * optionally based on the instance received
+	 * as a parameter, to be used in the query
+	 * that fetches a list of resources (index).
+	 */
+	public function modifyIndexQuery(Builder $q)
+	{
+		return $q;
+	}
+
+	/**
+	 * Returns a new query builder instance,
+	 * optionally based on the instance received
+	 * as a parameter, to be used in the query
+	 * that fetches a single resources (show).
+	 */
+	public function modifyShowQuery(Builder $q)
+	{
+		return $q;
 	}
 
 	/*
