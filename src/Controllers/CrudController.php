@@ -83,12 +83,8 @@ abstract class CrudController extends RootController
 			return $this->response->build(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
 		}
 
-		try {
-			$inserted = $this->model->create($data);
-			$entity = $this->model->with($this->ctx->with())->find($inserted->id);
-		} catch (\Exception $e) {
-			return $this->response->build(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
-		}
+		$inserted = $this->model->create($data);
+		$entity = $this->model->with($this->ctx->with())->find($inserted->id);
 
 		return $this->response->build($entity, HttpStatusCodes::CREATED);
 	}
@@ -121,12 +117,8 @@ abstract class CrudController extends RootController
 			return $this->response->build(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
 		}
 
-		try {
-			$entity->fill($data)->save();
-			$entity = $this->model->with($this->ctx->with())->find($id);
-		} catch (\Exception $e) {
-			return $this->response->build(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
-		}
+		$entity->fill($data)->save();
+		$entity = $this->model->with($this->ctx->with())->find($id);
 
 		return $this->response->build($entity, HttpStatusCodes::OK);
 	}
@@ -142,11 +134,7 @@ abstract class CrudController extends RootController
 			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
 		}
 
-		try {
-			$entity->delete();
-		} catch (\Exception $e) {
-			return $this->response->build(['error' => 'internal_error'], HttpStatusCodes::INTERNAL_SERVER_ERROR);
-		}
+		$entity->delete();
 
 		return $this->response->build(null, HttpStatusCodes::NO_CONTENT);
 	}
