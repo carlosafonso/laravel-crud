@@ -50,7 +50,9 @@ abstract class CrudController extends RootController
 	 */
 	public function index()
 	{
-		return $this->response->build($this->model->with($this->ctx->with())->get());
+		$entities = $this->model->with($this->ctx->with())
+			->paginate($this->ctx->pageSize());
+		return $this->response->build($entities);
 	}
 
 	public function create()
