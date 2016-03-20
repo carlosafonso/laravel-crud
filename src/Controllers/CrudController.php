@@ -2,6 +2,7 @@
 namespace Afonso\LvCrud\Controllers;
 
 use Evalua\Toolbox\Constants\HttpStatusCodes;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as RequestFacade;
 use Illuminate\Support\Facades\Response;
