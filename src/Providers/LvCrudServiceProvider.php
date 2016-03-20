@@ -5,6 +5,11 @@ use Illuminate\Support\ServiceProvider;
 
 class LvCrudServiceProvider extends ServiceProvider
 {
+	public function register()
+	{
+		//
+	}
+
 	public function boot()
 	{
 		$this->publishes([

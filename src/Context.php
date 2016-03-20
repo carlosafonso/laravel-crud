@@ -2,6 +2,7 @@
 namespace Afonso\LvCrud;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class Context
 {
@@ -24,7 +25,7 @@ class Context
 	public function __construct(Request $request)
 	{
 		$this->setWith($request->get('with'));
-		$this->pageSize = $request->get('page_size', 15);
+		$this->pageSize = $request->get('page_size', Config::get('crud.default_items_per_page'));
 	}
 
 	public function with()
