@@ -18,7 +18,7 @@ abstract class CrudController extends RootController
 	 * The model instance related to
 	 * this controller.
 	 *
-	 * @var	Afonso\LvCrud\BaseModel
+	 * @var	Illuminate\Database\Eloquent\Model
 	 */
 	protected $model;
 
@@ -36,6 +36,16 @@ abstract class CrudController extends RootController
 	 * @var	Afonso\LvCrud\ResponseBuilderInterface
 	 */
 	protected $response;
+
+	/**
+	 * Whether this controller is read-only.
+	 *
+	 * Read-only controllers don't allow POSTs,
+	 * PUTs nor DELETEs.
+	 *
+	 * @var	bool
+	 */
+	protected $readOnly = false;
 
 	public function __construct()
 	{
@@ -77,7 +87,7 @@ abstract class CrudController extends RootController
 
 	public function store(Request $request)
 	{
-		if ($this->model->isReadOnly()) {
+		if ($this->readOnly) {
 			return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
 		}
 
@@ -127,7 +137,7 @@ abstract class CrudController extends RootController
 
 	public function update(Request $request, $id)
 	{
-		if ($this->model->isReadOnly()) {
+		if ($this->readOnly) {
 			return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
 		}
 
@@ -172,7 +182,7 @@ abstract class CrudController extends RootController
 
 	public function destroy($id)
 	{
-		if ($this->model->isReadOnly()) {
+		if ($this->readOnly) {
 			return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
 		}
 
