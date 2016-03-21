@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "13ec9771302427f269d1a3686aefb17c",
-    "content-hash": "01477c21fc1dc30dfb77cfd37e2670ee",
+    "hash": "be314eef16b75ca637484759f9241072",
+    "content-hash": "5b62807834cb08131d6860abdb792127",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -166,7 +166,7 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "git@github.com:evalua/php-toolbox.git",
+                "url": "https://github.com/evalua/php-toolbox.git",
                 "reference": "88e3a2b8b8252df65e11fe06a4fbdf8d464f4fb9"
             },
             "dist": {

@@ -1,15 +1,17 @@
 <?php
 namespace Afonso\LvCrud\Tests;
 
+use Afonso\LvCrud\Context;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-
-use Afonso\LvCrud\Context;
+use Illuminate\Support\Facades\Config;
 
 class ContextTest extends BaseTestCase
 {
-	public function testContextWith()
+	public function testWith()
 	{
+		Config::shouldReceive('get');
+
 		$req = $this->getRequest(['with' => 'foo']);
 		$ctx = new Context($req);
 
@@ -29,6 +31,14 @@ class ContextTest extends BaseTestCase
 		$ctx = new Context($req);
 
 		$this->assertEquals([], $ctx->with());
+	}
+
+	public function testPageSizeIsReadFromUrlParams()
+	{
+		$req = $this->getRequest(['page_size' => 50]);
+		$ctx = new Context($req);
+
+		$this->assertEquals(50, $ctx->pageSize());
 	}
 
 	private function getRequest($params)
