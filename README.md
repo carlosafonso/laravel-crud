@@ -80,6 +80,20 @@ public function supportsHtml()
 }
 ```
 
+### Read-only controllers
+Read-only controllers don't allow creating, updating or deleting data.
+
+A controller can be declared as read-only by setting the `$readOnly` flag to `true`:
+
+```php
+class MyController extends CrudController
+{
+    protected $readOnly = true;
+}
+```
+
+Read-only controllers will return with an HTTP status of `405 Method Not Allowed when doing POSTs, PUTs or DELETEs on the resource.
+
 ## Configuration options
 The following attributes can be modified in the configuration file, `crud.php`:
 
