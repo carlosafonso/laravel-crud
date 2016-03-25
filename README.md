@@ -61,6 +61,9 @@ public function getModelNamespace()
 }
 ```
 
+### CrudModelInterface
+This library expects all related models to implement `Afonso\LvCrud\Models\CrudModelInterface`. You can either do this for all models or just implement this on a base model class that you will later extend and override if necessary.
+
 ### HTML/JSON support
 By default, CRUD controllers support both JSON and HTML responses. This behavior can be tuned by overriding the following functions:
 
