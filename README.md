@@ -95,7 +95,7 @@ class MyController extends CrudController
 }
 ```
 
-Read-only controllers will return with an HTTP status of `405 Method Not Allowed when doing POSTs, PUTs or DELETEs on the resource.
+Read-only controllers will return with an HTTP status of `405 Method Not Allowed` when doing POSTs, PUTs or DELETEs on the resource.
 
 ## Configuration options
 The following attributes can be modified in the configuration file, `crud.php`:
