@@ -1,6 +1,7 @@
 <?php
 namespace Afonso\LvCrud\Controllers;
 
+use RuntimeException;
 use Evalua\Toolbox\Constants\HttpStatusCodes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Support\Pluralizer;
 
 use Afonso\LvCrud\Context;
 use Afonso\LvCrud\Responses\ResponseBuilderFactory;
+use Afonso\LvCrud\Models\CrudModelInterface;
 
 abstract class CrudController extends RootController
 {
@@ -316,14 +318,23 @@ abstract class CrudController extends RootController
 
 	/**
 	 * Returns an instance of the model
-	 * related to this controller.
+	 * related to this controller. If the model 
+	 * does not implement the CrudModelInterface 
+	 * it will rise an exception.
+	 *
+	 * @throws RuntimeException if the related model does
+	 * not implement the CrudModelInterface.
 	 *
 	 * @return	Illuminate\Database\Eloquent\Model
 	 */
 	public function getRelatedModel()
 	{
 		$class = $this->getRelatedModelClass();
-		return new $class;
+		$instance = new $class;
+		if ($instance instanceof CrudModelInterface === false) {
+			throw new RuntimeException("The CrudController related model must be an implementation of CrudModelInterface.");
+		}
+		return $instance;
 	}
 
 	/**
