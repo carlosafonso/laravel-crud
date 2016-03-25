@@ -107,7 +107,10 @@ abstract class CrudController extends RootController
 		$validator = Validator::make($data, $this->model->getValidationRules());
 
 		if ($validator->fails()) {
-			return $this->response->build(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
+			return $this->response->build(
+				['error' => 'unprocessable_entity', 'validation_errors' => $validator->errors()->all()],
+				HttpStatusCodes::UNPROCESSABLE_ENTITY
+			);
 		}
 
 		// hook: beforeInsert()
@@ -162,7 +165,10 @@ abstract class CrudController extends RootController
 		$validator = Validator::make($data, $this->model->getValidationRules());
 
 		if ($validator->fails()) {
-			return $this->response->build(['error' => 'unprocessable_entity'], HttpStatusCodes::UNPROCESSABLE_ENTITY);
+			return $this->response->build(
+				['error' => 'unprocessable_entity', 'validation_errors' => $validator->errors()->all()],
+				HttpStatusCodes::UNPROCESSABLE_ENTITY
+			);
 		}
 
 		// hook: beforeUpdate()
