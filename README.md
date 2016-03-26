@@ -46,10 +46,10 @@ class FoosController extends CrudController
 This will automatically enable the CRUD behavior.
 
 ### Default model namespace
-This library assumes that all models are namespaced using the following rules:
+This library assumes that all models are namespaced under `App`:
 
 ```
-Foo\Bar\Controllers\FoosController -> Foo\Bar\Models\Foo
+App\Controllers\FoosController -> App\Foo
 ```
 
 If your code does not follow this convention, the default model namespace can be specified by overriding the `getModelNamespace` function in your controller.
