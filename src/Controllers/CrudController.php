@@ -353,15 +353,10 @@ abstract class CrudController extends RootController
 	 * the controller's name minus the
 	 * 'Controller' suffix.
 	 *
-	 * Additionally, if the controller class
-	 * is namespaced under 'Controllers' this
-	 * method will automatically replace it
-	 * with 'Models'.
-	 *
-	 * E.g., if the controller's classname
-	 * is 'App\Controllers\FoosController' then
-	 * this method will return
-	 * 'App\Models\Foo'.
+	 * It will also assume that the model class
+	 * is namespaced under 'App', unless specified
+	 * otherwise. A different namespace can
+	 * be set by overriding getModelNamespace().
 	 *
 	 * @return	string
 	 */
@@ -370,15 +365,8 @@ abstract class CrudController extends RootController
 		$fqController = explode('\\', static::class);
 		$model = Pluralizer::singular(str_replace('Controller', '', end($fqController)));
 
-		if (($ns = $this->getModelNamespace()) !== null) {
-			return $ns . '\\' . $model;
-		}
-
-		$fqController[count($fqController) - 1] = $model;
-		if (($idx = array_search('Controllers', $fqController))	!== false) {
-			$fqController[$idx] = 'Models';
-		}
-		return implode('\\', $fqController);
+		$ns = $this->getModelNamespace() ? : 'App';
+		return $ns . '\\' . $model;
 	}
 
 	/**
