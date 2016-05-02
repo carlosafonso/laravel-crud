@@ -162,7 +162,7 @@ abstract class CrudController extends RootController
 			return $hookResult;
 		}
 
-		$validator = Validator::make($data, $this->model->getValidationRules());
+		$validator = Validator::make($data, $this->model->getValidationRules($entity->id));
 
 		if ($validator->fails()) {
 			return $this->response->build(
