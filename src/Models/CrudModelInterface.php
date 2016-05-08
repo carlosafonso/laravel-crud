@@ -11,8 +11,10 @@ interface CrudModelInterface
 	 * The returned value is an array of rules as
 	 * explained in the official Laravel documentation.
 	 *
+	 * @param integer $entityId The id of the instance of the model being
+	 * processed.
 	 * @return array
 	 * @link https://laravel.com/docs/5.2/validation
 	 */
-	public function getValidationRules();
+	public function getValidationRules($entityId = null);
 }
