@@ -7,13 +7,14 @@ use Afonso\LvCrud\Models\CrudModelInterface;
 use Evalua\Toolbox\Constants\HttpStatusCodes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Request as RequestFacade;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Pluralizer;
 use RuntimeException;
 
-abstract class CrudController extends RootController
+abstract class CrudController extends BaseController
 {
 	/**
 	 * The model instance related to
