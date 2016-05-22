@@ -8,41 +8,41 @@ use Illuminate\Support\Facades\Config;
 
 class ContextTest extends BaseTestCase
 {
-	public function testWith()
-	{
-		Config::shouldReceive('get');
+    public function testWith()
+    {
+        Config::shouldReceive('get');
 
-		$req = $this->getRequest(['with' => 'foo']);
-		$ctx = new Context($req);
+        $req = $this->getRequest(['with' => 'foo']);
+        $ctx = new Context($req);
 
-		$this->assertEquals(['foo'], $ctx->with());
+        $this->assertEquals(['foo'], $ctx->with());
 
-		$req = $this->getRequest(['with' => 'foo,bar']);
-		$ctx = new Context($req);
+        $req = $this->getRequest(['with' => 'foo,bar']);
+        $ctx = new Context($req);
 
-		$this->assertEquals(['foo', 'bar'], $ctx->with());
+        $this->assertEquals(['foo', 'bar'], $ctx->with());
 
-		$req = $this->getRequest(['with' => '  foo , bar']);
-		$ctx = new Context($req);
+        $req = $this->getRequest(['with' => '  foo , bar']);
+        $ctx = new Context($req);
 
-		$this->assertEquals(['foo', 'bar'], $ctx->with());
+        $this->assertEquals(['foo', 'bar'], $ctx->with());
 
-		$req = $this->getRequest([]);
-		$ctx = new Context($req);
+        $req = $this->getRequest([]);
+        $ctx = new Context($req);
 
-		$this->assertEquals([], $ctx->with());
-	}
+        $this->assertEquals([], $ctx->with());
+    }
 
-	public function testPageSizeIsReadFromUrlParams()
-	{
-		$req = $this->getRequest(['page_size' => 50]);
-		$ctx = new Context($req);
+    public function testPageSizeIsReadFromUrlParams()
+    {
+        $req = $this->getRequest(['page_size' => 50]);
+        $ctx = new Context($req);
 
-		$this->assertEquals(50, $ctx->pageSize());
-	}
+        $this->assertEquals(50, $ctx->pageSize());
+    }
 
-	private function getRequest($params)
-	{
-		return Request::create('foo', 'GET', $params);
-	}
+    private function getRequest($params)
+    {
+        return Request::create('foo', 'GET', $params);
+    }
 }

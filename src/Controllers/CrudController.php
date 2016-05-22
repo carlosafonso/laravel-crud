@@ -16,394 +16,394 @@ use RuntimeException;
 
 abstract class CrudController extends BaseController
 {
-	/**
-	 * The model instance related to
-	 * this controller.
-	 *
-	 * @var	Illuminate\Database\Eloquent\Model
-	 */
-	protected $model;
+    /**
+     * The model instance related to
+     * this controller.
+     *
+     * @var Illuminate\Database\Eloquent\Model
+     */
+    protected $model;
 
-	/**
-	 * The context of the current request.
-	 *
-	 * @var	Afonso\LvCrud\Context
-	 */
-	protected $ctx;
+    /**
+     * The context of the current request.
+     *
+     * @var Afonso\LvCrud\Context
+     */
+    protected $ctx;
 
-	/**
-	 * The response builder used to generate
-	 * content-type agnostic responses.
-	 *
-	 * @var	Afonso\LvCrud\ResponseBuilderInterface
-	 */
-	protected $response;
+    /**
+     * The response builder used to generate
+     * content-type agnostic responses.
+     *
+     * @var Afonso\LvCrud\ResponseBuilderInterface
+     */
+    protected $response;
 
-	/**
-	 * Whether this controller is read-only.
-	 *
-	 * Read-only controllers don't allow POSTs,
-	 * PUTs nor DELETEs.
-	 *
-	 * @var	bool
-	 */
-	protected $readOnly = false;
+    /**
+     * Whether this controller is read-only.
+     *
+     * Read-only controllers don't allow POSTs,
+     * PUTs nor DELETEs.
+     *
+     * @var bool
+     */
+    protected $readOnly = false;
 
-	public function __construct()
-	{
-		$this->model = $this->getRelatedModel();
+    public function __construct()
+    {
+        $this->model = $this->getRelatedModel();
 
-		$this->ctx = new Context(RequestFacade::instance());
+        $this->ctx = new Context(RequestFacade::instance());
 
-		$this->response = ResponseBuilderFactory::forRequest(RequestFacade::instance(), $this);
-	}
+        $this->response = ResponseBuilderFactory::forRequest(RequestFacade::instance(), $this);
+    }
 
-	/*
-	 * CRUD methods
-	 */
-	public function index()
-	{
-		$entities = $this->modifyIndexQuery($this->model->newQuery())
-			->with($this->ctx->with())
-			->paginate($this->ctx->pageSize());
-		return $this->response->build($entities);
-	}
+    /*
+     * CRUD methods
+     */
+    public function index()
+    {
+        $entities = $this->modifyIndexQuery($this->model->newQuery())
+            ->with($this->ctx->with())
+            ->paginate($this->ctx->pageSize());
+        return $this->response->build($entities);
+    }
 
-	public function create()
-	{
-		return $this->response->build(null);
-	}
+    public function create()
+    {
+        return $this->response->build(null);
+    }
 
-	public function show($id)
-	{
-		$entity = $this->modifyShowQuery($this->model->newQuery())
-			->with($this->ctx->with())
-			->find($id);
+    public function show($id)
+    {
+        $entity = $this->modifyShowQuery($this->model->newQuery())
+            ->with($this->ctx->with())
+            ->find($id);
 
-		if (! $entity) {
-			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
-		}
+        if (! $entity) {
+            return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+        }
 
-		return $this->response->build($entity);
-	}
+        return $this->response->build($entity);
+    }
 
-	public function store(Request $request)
-	{
-		if ($this->readOnly) {
-			return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
-		}
+    public function store(Request $request)
+    {
+        if ($this->readOnly) {
+            return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+        }
 
-		$data = $request->all();
+        $data = $request->all();
 
-		// hook: beforeValidate()
-		if ($hookResult = $this->beforeValidate($request, $data)) {
-			return $hookResult;
-		}
+        // hook: beforeValidate()
+        if ($hookResult = $this->beforeValidate($request, $data)) {
+            return $hookResult;
+        }
 
-		// hook: beforeStoreValidate()
-		if ($hookResult = $this->beforeStoreValidate($request, $data)) {
-			return $hookResult;
-		}
+        // hook: beforeStoreValidate()
+        if ($hookResult = $this->beforeStoreValidate($request, $data)) {
+            return $hookResult;
+        }
 
-		$validator = Validator::make($data, $this->model->getValidationRules());
+        $validator = Validator::make($data, $this->model->getValidationRules());
 
-		if ($validator->fails()) {
-			return $this->response->build(
-				['error' => 'unprocessable_entity', 'validation_errors' => $validator->errors()->all()],
-				HttpStatusCodes::UNPROCESSABLE_ENTITY
-			);
-		}
+        if ($validator->fails()) {
+            return $this->response->build(
+                ['error' => 'unprocessable_entity', 'validation_errors' => $validator->errors()->all()],
+                HttpStatusCodes::UNPROCESSABLE_ENTITY
+            );
+        }
 
-		// hook: beforeInsert()
-		if ($hookResult = $this->beforeInsert($request, $data)) {
-			return $hookResult;
-		}
+        // hook: beforeInsert()
+        if ($hookResult = $this->beforeInsert($request, $data)) {
+            return $hookResult;
+        }
 
-		$inserted = $this->model->create($data);
-		$entity = $this->model->with($this->ctx->with())->find($inserted->id);
+        $inserted = $this->model->create($data);
+        $entity = $this->model->with($this->ctx->with())->find($inserted->id);
 
-		// hook: afterInsert()
-		if ($hookResult = $this->afterInsert($request, $entity)) {
-			return $hookResult;
-		}
+        // hook: afterInsert()
+        if ($hookResult = $this->afterInsert($request, $entity)) {
+            return $hookResult;
+        }
 
-		return $this->response->build($entity, HttpStatusCodes::CREATED);
-	}
+        return $this->response->build($entity, HttpStatusCodes::CREATED);
+    }
 
-	public function edit($id)
-	{
-		$entity = $this->model->with($this->ctx->with())->find($id);
-		if (! $entity) {
-			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
-		}
+    public function edit($id)
+    {
+        $entity = $this->model->with($this->ctx->with())->find($id);
+        if (! $entity) {
+            return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+        }
 
-		return $this->response->build($entity);
-	}
+        return $this->response->build($entity);
+    }
 
-	public function update(Request $request, $id)
-	{
-		if ($this->readOnly) {
-			return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
-		}
+    public function update(Request $request, $id)
+    {
+        if ($this->readOnly) {
+            return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+        }
 
-		$entity = $this->model->find($id);
-		if (! $entity) {
-			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
-		}
+        $entity = $this->model->find($id);
+        if (! $entity) {
+            return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+        }
 
-		$data = $request->all();
+        $data = $request->all();
 
-		// hook: beforeValidate()
-		if ($hookResult = $this->beforeValidate($request, $data)) {
-			return $hookResult;
-		}
+        // hook: beforeValidate()
+        if ($hookResult = $this->beforeValidate($request, $data)) {
+            return $hookResult;
+        }
 
-		// hook: beforeUpdateValidate()
-		if ($hookResult = $this->beforeUpdateValidate($request, $id, $data)) {
-			return $hookResult;
-		}
+        // hook: beforeUpdateValidate()
+        if ($hookResult = $this->beforeUpdateValidate($request, $id, $data)) {
+            return $hookResult;
+        }
 
-		$validator = Validator::make($data, $this->model->getValidationRules($entity->id));
+        $validator = Validator::make($data, $this->model->getValidationRules($entity->id));
 
-		if ($validator->fails()) {
-			return $this->response->build(
-				['error' => 'unprocessable_entity', 'validation_errors' => $validator->errors()->all()],
-				HttpStatusCodes::UNPROCESSABLE_ENTITY
-			);
-		}
+        if ($validator->fails()) {
+            return $this->response->build(
+                ['error' => 'unprocessable_entity', 'validation_errors' => $validator->errors()->all()],
+                HttpStatusCodes::UNPROCESSABLE_ENTITY
+            );
+        }
 
-		// hook: beforeUpdate()
-		if ($hookResult = $this->beforeUpdate($request, $data, $id)) {
-			return $hookResult;
-		}
+        // hook: beforeUpdate()
+        if ($hookResult = $this->beforeUpdate($request, $data, $id)) {
+            return $hookResult;
+        }
 
-		$entity->fill($data)->save();
-		$entity = $this->model->with($this->ctx->with())->find($id);
+        $entity->fill($data)->save();
+        $entity = $this->model->with($this->ctx->with())->find($id);
 
-		// hook: afterUpdate()
-		if ($hookResult = $this->afterUpdate($request, $entity)) {
-			return $hookResult;
-		}
+        // hook: afterUpdate()
+        if ($hookResult = $this->afterUpdate($request, $entity)) {
+            return $hookResult;
+        }
 
-		return $this->response->build($entity, HttpStatusCodes::OK);
-	}
+        return $this->response->build($entity, HttpStatusCodes::OK);
+    }
 
-	public function destroy($id)
-	{
-		if ($this->readOnly) {
-			return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
-		}
+    public function destroy($id)
+    {
+        if ($this->readOnly) {
+            return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+        }
 
-		$entity = $this->model->find($id);
-		if (! $entity) {
-			return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
-		}
+        $entity = $this->model->find($id);
+        if (! $entity) {
+            return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+        }
 
-		$entity->delete();
+        $entity->delete();
 
-		return $this->response->build(null, HttpStatusCodes::NO_CONTENT);
-	}
-	/*
-	 * End of CRUD methods
-	 */
+        return $this->response->build(null, HttpStatusCodes::NO_CONTENT);
+    }
+    /*
+     * End of CRUD methods
+     */
 
-	/*
-	 * Hooks
-	 */
+    /*
+     * Hooks
+     */
 
-	/**
-	 * This hook runs before validation occurs
-	 * both on insertions an updates.
-	 *
-	 * Returning a non-null value will cause the
-	 * controller method to automatically return
-	 * with that value.
-	 */
-	public function beforeValidate(Request $request, &$data)
-	{
-		//
-	}
+    /**
+     * This hook runs before validation occurs
+     * both on insertions an updates.
+     *
+     * Returning a non-null value will cause the
+     * controller method to automatically return
+     * with that value.
+     */
+    public function beforeValidate(Request $request, &$data)
+    {
+        //
+    }
 
-	/**
-	 * This hook runs before validation occurs
-	 * on insertions, but after the beforeValidate()
-	 * hook has run.
-	 *
-	 * Returning a non-null value will cause the
-	 * controller method to automatically return
-	 * with that value.
-	 */
-	public function beforeStoreValidate(Request $request, &$data)
-	{
-		//
-	}
+    /**
+     * This hook runs before validation occurs
+     * on insertions, but after the beforeValidate()
+     * hook has run.
+     *
+     * Returning a non-null value will cause the
+     * controller method to automatically return
+     * with that value.
+     */
+    public function beforeStoreValidate(Request $request, &$data)
+    {
+        //
+    }
 
-	/**
-	 * This hook runs before validation occurs
-	 * on updates, but after the beforeValidate()
-	 * hook has run.
-	 *
-	 * Returning a non-null value will cause the
-	 * controller method to automatically return
-	 * with that value.
-	 */
-	public function beforeUpdateValidate(Request $request, $id, &$data)
-	{
-		//
-	}
+    /**
+     * This hook runs before validation occurs
+     * on updates, but after the beforeValidate()
+     * hook has run.
+     *
+     * Returning a non-null value will cause the
+     * controller method to automatically return
+     * with that value.
+     */
+    public function beforeUpdateValidate(Request $request, $id, &$data)
+    {
+        //
+    }
 
-	/**
-	 * This hook runs before insertion occurs, but
-	 * after validation has passed.
-	 *
-	 * Returning a non-null value will cause the
-	 * controller method to automatically return
-	 * with that value.
-	 */
-	public function beforeInsert(Request $request, &$data)
-	{
-		//
-	}
+    /**
+     * This hook runs before insertion occurs, but
+     * after validation has passed.
+     *
+     * Returning a non-null value will cause the
+     * controller method to automatically return
+     * with that value.
+     */
+    public function beforeInsert(Request $request, &$data)
+    {
+        //
+    }
 
-	/**
-	 * This hook runs after insertion occurs, as long
-	 * as it succeeds.
-	 */
-	public function afterInsert(Request $request, $entity)
-	{
-		//
-	}
+    /**
+     * This hook runs after insertion occurs, as long
+     * as it succeeds.
+     */
+    public function afterInsert(Request $request, $entity)
+    {
+        //
+    }
 
-	/**
-	 * This hook runs before updating occurs, but
-	 * after validation has passed.
-	 *
-	 * Returning a non-null value will cause the
-	 * controller method to automatically return
-	 * with that value.
-	 */
-	public function beforeUpdate(Request $request, &$data, $id)
-	{
-		//
-	}
+    /**
+     * This hook runs before updating occurs, but
+     * after validation has passed.
+     *
+     * Returning a non-null value will cause the
+     * controller method to automatically return
+     * with that value.
+     */
+    public function beforeUpdate(Request $request, &$data, $id)
+    {
+        //
+    }
 
-	/**
-	 * This hook runs after updating occurs, as long
-	 * as it succeeds.
-	 */
-	public function afterUpdate(Request $request, $entity)
-	{
-		//
-	}
+    /**
+     * This hook runs after updating occurs, as long
+     * as it succeeds.
+     */
+    public function afterUpdate(Request $request, $entity)
+    {
+        //
+    }
 
-	/**
-	 * Returns a new query builder instance,
-	 * optionally based on the instance received
-	 * as a parameter, to be used in the query
-	 * that fetches a list of resources (index).
-	 */
-	public function modifyIndexQuery(Builder $q)
-	{
-		return $q;
-	}
+    /**
+     * Returns a new query builder instance,
+     * optionally based on the instance received
+     * as a parameter, to be used in the query
+     * that fetches a list of resources (index).
+     */
+    public function modifyIndexQuery(Builder $q)
+    {
+        return $q;
+    }
 
-	/**
-	 * Returns a new query builder instance,
-	 * optionally based on the instance received
-	 * as a parameter, to be used in the query
-	 * that fetches a single resources (show).
-	 */
-	public function modifyShowQuery(Builder $q)
-	{
-		return $q;
-	}
+    /**
+     * Returns a new query builder instance,
+     * optionally based on the instance received
+     * as a parameter, to be used in the query
+     * that fetches a single resources (show).
+     */
+    public function modifyShowQuery(Builder $q)
+    {
+        return $q;
+    }
 
-	/*
-	 * End of hooks
-	 */
+    /*
+     * End of hooks
+     */
 
-	/**
-	 * Returns an instance of the model
-	 * related to this controller. If the model
-	 * does not implement the CrudModelInterface
-	 * it will rise an exception.
-	 *
-	 * @throws RuntimeException if the related model does
-	 * not implement the CrudModelInterface.
-	 *
-	 * @return	Illuminate\Database\Eloquent\Model
-	 */
-	public function getRelatedModel()
-	{
-		$class = $this->getRelatedModelClass();
-		$instance = new $class;
-		if ($instance instanceof CrudModelInterface) {
-			return $instance;
-		}
+    /**
+     * Returns an instance of the model
+     * related to this controller. If the model
+     * does not implement the CrudModelInterface
+     * it will rise an exception.
+     *
+     * @throws RuntimeException if the related model does
+     * not implement the CrudModelInterface.
+     *
+     * @return  Illuminate\Database\Eloquent\Model
+     */
+    public function getRelatedModel()
+    {
+        $class = $this->getRelatedModelClass();
+        $instance = new $class;
+        if ($instance instanceof CrudModelInterface) {
+            return $instance;
+        }
 
-		throw new RuntimeException("The related model must implement CrudModelInterface");
-	}
+        throw new RuntimeException("The related model must implement CrudModelInterface");
+    }
 
-	/**
-	 * Returns the fully qualified class
-	 * of the model associated with this
-	 * controller.
-	 *
-	 * This method assumes that the model
-	 * class is the singularized form of
-	 * the controller's name minus the
-	 * 'Controller' suffix.
-	 *
-	 * It will also assume that the model class
-	 * is namespaced under 'App', unless specified
-	 * otherwise. A different namespace can
-	 * be set by overriding getModelNamespace().
-	 *
-	 * @return	string
-	 */
-	public function getRelatedModelClass()
-	{
-		$fqController = explode('\\', static::class);
-		$model = Pluralizer::singular(str_replace('Controller', '', end($fqController)));
+    /**
+     * Returns the fully qualified class
+     * of the model associated with this
+     * controller.
+     *
+     * This method assumes that the model
+     * class is the singularized form of
+     * the controller's name minus the
+     * 'Controller' suffix.
+     *
+     * It will also assume that the model class
+     * is namespaced under 'App', unless specified
+     * otherwise. A different namespace can
+     * be set by overriding getModelNamespace().
+     *
+     * @return  string
+     */
+    public function getRelatedModelClass()
+    {
+        $fqController = explode('\\', static::class);
+        $model = Pluralizer::singular(str_replace('Controller', '', end($fqController)));
 
-		$ns = $this->getModelNamespace() ? : 'App';
-		return $ns . '\\' . $model;
-	}
+        $ns = $this->getModelNamespace() ? : 'App';
+        return $ns . '\\' . $model;
+    }
 
-	/**
-	 * Returns the specific namespace of the
-	 * model related to this controller.
-	 *
-	 * Override this function if your model does
-	 * not follow the namespacing conventions used
-	 * by this controller.
-	 *
-	 * @return	string
-	 */
-	protected function getModelNamespace()
-	{
-		return null;
-	}
+    /**
+     * Returns the specific namespace of the
+     * model related to this controller.
+     *
+     * Override this function if your model does
+     * not follow the namespacing conventions used
+     * by this controller.
+     *
+     * @return  string
+     */
+    protected function getModelNamespace()
+    {
+        return null;
+    }
 
-	/**
-	 * Returns whether this controller instance
-	 * supports JSON responses.
-	 *
-	 * @return	boolean
-	 */
-	public function supportsJson()
-	{
-		return true;
-	}
+    /**
+     * Returns whether this controller instance
+     * supports JSON responses.
+     *
+     * @return  boolean
+     */
+    public function supportsJson()
+    {
+        return true;
+    }
 
-	/**
-	 * Returns whether this controller instance
-	 * supports HTML responses.
-	 *
-	 * @return	boolean
-	 */
-	public function supportsHtml()
-	{
-		return true;
-	}
+    /**
+     * Returns whether this controller instance
+     * supports HTML responses.
+     *
+     * @return  boolean
+     */
+    public function supportsHtml()
+    {
+        return true;
+    }
 }

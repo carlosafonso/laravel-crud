@@ -5,10 +5,10 @@ use Illuminate\Http\Request;
 
 abstract class ResponseBuilder implements ResponseBuilderInterface
 {
-	protected $request;
+    protected $request;
 
-	public function __construct(Request $request)
-	{
-		$this->request = $request;
-	}
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
 }
