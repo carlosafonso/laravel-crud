@@ -84,6 +84,11 @@ abstract class CrudController extends BaseController
             return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
         }
 
+        // hook: afterShow()
+        if ($hookResult = $this->afterShow($entity)) {
+            return $hookResult;
+        }
+
         return $this->response->build($entity);
     }
 
@@ -210,6 +215,19 @@ abstract class CrudController extends BaseController
     /*
      * Hooks
      */
+
+    /**
+     * This hook runs after fetching a single
+     * entity, as long as it exists.
+     *
+     * Returning a non-null value will cause the
+     * controller method to automatically return
+     * with that value.
+     */
+    public function afterShow($entity)
+    {
+        //
+    }
 
     /**
      * This hook runs before validation occurs
