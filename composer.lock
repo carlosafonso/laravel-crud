@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "be314eef16b75ca637484759f9241072",
-    "content-hash": "5b62807834cb08131d6860abdb792127",
+    "hash": "612810b8a226bcb8211d917f6e51a7d4",
+    "content-hash": "fdd651742860d73ed9121d68c6e3e210",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -160,53 +160,6 @@
                 "string"
             ],
             "time": "2015-11-06 14:35:42"
-        },
-        {
-            "name": "evalua/php-toolbox",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/evalua/php-toolbox.git",
-                "reference": "88e3a2b8b8252df65e11fe06a4fbdf8d464f4fb9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/evalua/php-toolbox/zipball/88e3a2b8b8252df65e11fe06a4fbdf8d464f4fb9",
-                "reference": "88e3a2b8b8252df65e11fe06a4fbdf8d464f4fb9",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "codeclimate/php-test-reporter": "dev-master",
-                "mikey179/vfsstream": "1.*",
-                "phpunit/phpunit": "4.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Evalua\\Toolbox\\": "src/",
-                    "Evalua\\Toolbox\\Tests\\": "tests/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Carlos Afonso",
-                    "email": "carlos.afonso@e-valua.es"
-                },
-                {
-                    "name": "Miguel Ángel Valentín",
-                    "email": "miguelangel.valentin@e-valua.es"
-                },
-                {
-                    "name": "Nacho Amelivia",
-                    "email": "nacho.amelivia@e-valua.es"
-                }
-            ],
-            "description": "E-valua's common PHP utility library",
-            "time": "2015-05-30 19:03:14"
         },
         {
             "name": "jakub-onderka/php-console-color",
@@ -1223,20 +1176,21 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v3.0.3",
+            "version": "v3.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "52065702c71743c05d415a8facfcad6d4257e8d7"
+                "reference": "18b24bc32d2495ae79d76e777368786a6536fe31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/52065702c71743c05d415a8facfcad6d4257e8d7",
-                "reference": "52065702c71743c05d415a8facfcad6d4257e8d7",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/18b24bc32d2495ae79d76e777368786a6536fe31",
+                "reference": "18b24bc32d2495ae79d76e777368786a6536fe31",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5.9"
+                "php": ">=5.5.9",
+                "symfony/polyfill-mbstring": "~1.1"
             },
             "require-dev": {
                 "symfony/expression-language": "~2.8|~3.0"
@@ -1271,7 +1225,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2016-02-28 16:24:34"
+            "time": "2016-04-12 18:09:53"
         },
         {
             "name": "symfony/http-kernel",
@@ -3264,13 +3218,11 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "evalua/php-toolbox": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4.0"
+        "php": "~5.5|~7.0"
     },
     "platform-dev": []
 }

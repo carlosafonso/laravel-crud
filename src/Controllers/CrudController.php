@@ -4,7 +4,7 @@ namespace Afonso\LvCrud\Controllers;
 use Afonso\LvCrud\Context;
 use Afonso\LvCrud\Responses\ResponseBuilderFactory;
 use Afonso\LvCrud\Models\CrudModelInterface;
-use Evalua\Toolbox\Constants\HttpStatusCodes;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -81,7 +81,7 @@ abstract class CrudController extends BaseController
             ->find($id);
 
         if (! $entity) {
-            return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+            return $this->response->build(['error' => 'not_found'], SymfonyResponse::HTTP_NOT_FOUND);
         }
 
         // hook: afterShow()
@@ -95,7 +95,7 @@ abstract class CrudController extends BaseController
     public function store(Request $request)
     {
         if ($this->readOnly) {
-            return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+            return $this->response->build(['error' => 'method_not_allowed'], SymfonyResponse::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $data = $request->all();
@@ -115,7 +115,7 @@ abstract class CrudController extends BaseController
         if ($validator->fails()) {
             return $this->response->build(
                 ['error' => 'unprocessable_entity', 'validation_errors' => $validator->errors()->all()],
-                HttpStatusCodes::UNPROCESSABLE_ENTITY
+                SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY
             );
         }
 
@@ -132,14 +132,14 @@ abstract class CrudController extends BaseController
             return $hookResult;
         }
 
-        return $this->response->build($entity, HttpStatusCodes::CREATED);
+        return $this->response->build($entity, SymfonyResponse::HTTP_CREATED);
     }
 
     public function edit($id)
     {
         $entity = $this->model->with($this->ctx->with())->find($id);
         if (! $entity) {
-            return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+            return $this->response->build(['error' => 'not_found'], SymfonyResponse::HTTP_NOT_FOUND);
         }
 
         return $this->response->build($entity);
@@ -148,12 +148,12 @@ abstract class CrudController extends BaseController
     public function update(Request $request, $id)
     {
         if ($this->readOnly) {
-            return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+            return $this->response->build(['error' => 'method_not_allowed'], SymfonyResponse::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $entity = $this->model->find($id);
         if (! $entity) {
-            return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+            return $this->response->build(['error' => 'not_found'], SymfonyResponse::HTTP_NOT_FOUND);
         }
 
         $data = $request->all();
@@ -173,7 +173,7 @@ abstract class CrudController extends BaseController
         if ($validator->fails()) {
             return $this->response->build(
                 ['error' => 'unprocessable_entity', 'validation_errors' => $validator->errors()->all()],
-                HttpStatusCodes::UNPROCESSABLE_ENTITY
+                SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY
             );
         }
 
@@ -190,23 +190,23 @@ abstract class CrudController extends BaseController
             return $hookResult;
         }
 
-        return $this->response->build($entity, HttpStatusCodes::OK);
+        return $this->response->build($entity, SymfonyResponse::HTTP_OK);
     }
 
     public function destroy($id)
     {
         if ($this->readOnly) {
-            return $this->response->build(['error' => 'method_not_allowed'], HttpStatusCodes::METHOD_NOT_ALLOWED);
+            return $this->response->build(['error' => 'method_not_allowed'], SymfonyResponse::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $entity = $this->model->find($id);
         if (! $entity) {
-            return $this->response->build(['error' => 'not_found'], HttpStatusCodes::NOT_FOUND);
+            return $this->response->build(['error' => 'not_found'], SymfonyResponse::HTTP_NOT_FOUND);
         }
 
         $entity->delete();
 
-        return $this->response->build(null, HttpStatusCodes::NO_CONTENT);
+        return $this->response->build(null, SymfonyResponse::HTTP_NO_CONTENT);
     }
     /*
      * End of CRUD methods
